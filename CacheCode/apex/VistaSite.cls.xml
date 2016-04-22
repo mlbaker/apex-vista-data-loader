@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.VistaSite">
+<Super>%Persistent</Super>
+<TimeCreated>64023,58103.604711</TimeCreated>
+
+<Property name="Sta3n">
+<Type>%String</Type>
+</Property>
+
+<Property name="Sta3a">
+<Type>%String</Type>
+</Property>
+
+<Property name="CacheNamespace">
+<Type>%String</Type>
+</Property>
+
+<Property name="VistaSiteName">
+<Type>%String</Type>
+</Property>
+
+<Property name="IPAddress">
+<Type>%String</Type>
+</Property>
+
+<Property name="Port">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="WebPort">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="VistaPopulate">
+<Type>%Boolean</Type>
+</Property>
+
+<Index name="MainIndex">
+<IdKey>1</IdKey>
+<PrimaryKey>1</PrimaryKey>
+<Properties>Sta3n</Properties>
+<Unique>1</Unique>
+</Index>
+
+<Method name="Initialize">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	//Initial Popuation of Vista Site with data.
+	Do ..%KillExtent()
+	Set oInstance=..%New()
+	Set oInstance.Sta3n=516
+	Set oInstance.Sta3a="BAY"
+	Set oInstance.Port=1972
+	Set oInstance.IPAddress="127.0.0.1"
+	Set oInstance.CacheNamespace="BAYPINES"
+	Set oInstance.VistaSiteName="Bay Pines VAMC"
+	Set oInstance.WebPort=57772
+	Set oInstance.VistaPopulate=1
+	Do oInstance.%Save()
+	
+	Set oInstance=..%New()
+	Set oInstance.Sta3n=548
+	Set oInstance.Sta3a="WPB"
+	Set oInstance.Port=1972
+	Set oInstance.IPAddress="127.0.0.1"
+	Set oInstance.CacheNamespace="WESTPALM"
+	Set oInstance.VistaSiteName="West Palm Beach VAMC"
+	Set oInstance.WebPort=57772
+	Set oInstance.VistaPopulate=1
+	Do oInstance.%Save()
+	
+	Set oInstance=..%New()
+	Set oInstance.Sta3n=673
+	Set oInstance.Sta3a="TAM"
+	Set oInstance.Port=1972
+	Set oInstance.IPAddress="127.0.0.1"
+	Set oInstance.CacheNamespace="HALEY"
+	Set oInstance.VistaSiteName="James A. Haley Veterans Hospital"
+	Set oInstance.WebPort=57772
+	Set oInstance.VistaPopulate=1
+	Do oInstance.%Save()
+	
+	Set oInstance=..%New()
+	Set oInstance.Sta3n=692
+	Set oInstance.Sta3a="SAJ"
+	Set oInstance.Port=1972
+	Set oInstance.IPAddress="127.0.0.1"
+	Set oInstance.CacheNamespace="SANJUAN"
+	Set oInstance.VistaSiteName="San Juan VAMC"
+	Set oInstance.WebPort=57772
+	Do oInstance.%Save()
+	
+	Set oInstance=..%New()
+	Set oInstance.Sta3n=999
+	Set oInstance.Sta3a="FOI"
+	Set oInstance.Port=1975
+	Set oInstance.IPAddress="127.0.0.1"
+	Set oInstance.CacheNamespace="FOIA"
+	Set oInstance.VistaSiteName="FOIA Empty Database"
+	Set oInstance.WebPort=57772
+	Do oInstance.%Save()
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.VistaSiteD</DataLocation>
+<DefaultData>VistaSiteDefaultData</DefaultData>
+<IdLocation>^apex.VistaSiteD</IdLocation>
+<IndexLocation>^apex.VistaSiteI</IndexLocation>
+<StreamLocation>^apex.VistaSiteS</StreamLocation>
+<Data name="VistaSiteDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Sta3n</Value>
+</Value>
+<Value name="3">
+<Value>Sta3a</Value>
+</Value>
+<Value name="4">
+<Value>CacheNamespace</Value>
+</Value>
+<Value name="5">
+<Value>VistaSiteName</Value>
+</Value>
+<Value name="6">
+<Value>IPAddress</Value>
+</Value>
+<Value name="7">
+<Value>Port</Value>
+</Value>
+<Value name="8">
+<Value>WebPort</Value>
+</Value>
+<Value name="9">
+<Value>VistaPopulate</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

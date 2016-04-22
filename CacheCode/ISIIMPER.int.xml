@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Routine name="ISIIMPER" type="INT" languagemode="0"><![CDATA[
+ISIIMPER ;;ISI GROUP/MLS -- ERROR PROCESSING
+ ;;1.0;;;Jun 26,2012;Build 63
+ ;
+ Q
+ ;
+ERR ;
+ S ISIRESUL(0)="-1^ERROR "_$$EC^%ZOSV
+ S (ISIRC,ISIRESUL)=ISIRESUL(0)
+ D @^%ZOSF("ERRTN")
+ Q:$Q 1  Q
+]]></Routine>
+</Export>

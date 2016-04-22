@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.VANewPersonFile">
+<Super>%Persistent</Super>
+<TimeCreated>64028,65330.795412</TimeCreated>
+
+<Property name="Name">
+<Type>%String</Type>
+<Parameter name="COLLATION" value="EXACT"/>
+</Property>
+
+<Property name="Type">
+<Type>%String</Type>
+</Property>
+
+<Property name="WriteRx">
+<Type>%Boolean</Type>
+</Property>
+
+<Index name="NameIndex">
+<Properties>Name</Properties>
+</Index>
+
+<Method name="PopulateFromAllergy">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Do ..%KillExtent()
+	Set AllergyID=$Order(^apex.AllergyDataD(0))
+	While +AllergyID
+	{
+		set oAllergy=##class(apex.AllergyData).%OpenId(AllergyID)
+		If $IsObject(oAllergy)
+		{
+			Set Provider=oAllergy.EnteredBy
+			If '$Data(^apex.VANewPersonFileI("NameIndex",Provider))
+			{
+				Set oPerson=..%New()
+				Set oPerson.Name=Provider
+				Set oPerson.Type="Provider"
+				Write:oPerson.%Save() "."
+			}
+		}
+		Set AllergyID=$Order(^apex.AllergyDataD(AllergyID))
+	}
+]]></Implementation>
+</Method>
+
+<Method name="PopulateFromMeds">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Set MedID=$Order(^apex.MedicationDataD(0))
+	While +MedID
+	{
+		set oMed=##class(apex.MedicationData).%OpenId(MedID)
+		If $IsObject(oMed)
+		{
+			Set Provider=oMed.Provider
+			If '$Data(^apex.VANewPersonFileI("NameIndex",Provider))
+			{
+				Set oPerson=..%New()
+				Set oPerson.Name=Provider
+				Set oPerson.Type="Provider"
+				Set oPerson.WriteRx=1
+				Write:oPerson.%Save() "."
+			}
+			Else
+			{
+				Set personID=$Order(^apex.VANewPersonFileI("NameIndex",Provider,0))
+				Set oPerson=..%OpenId(personID)
+				Set oPerson.WriteRx=1
+				Write:oPerson.%Save() "."
+			}
+		}
+		Set MedID=$Order(^apex.MedicationDataD(MedID))
+	}
+]]></Implementation>
+</Method>
+
+<Method name="PopulateVISTA">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Sta3n:%Integer</FormalSpec>
+<PublicList>DUZ,DT,FDA,U,MSG,Sta3n,DIC</PublicList>
+<Implementation><![CDATA[
+	Set DUZ=1,DUZ(0)="@",DT=##class(%FilemanDate).DateToLogical($H),U="^"
+	Set DIC(0)="L"
+	Set userID=$Order(^apex.VANewPersonFileD(0))
+	While +userID
+	{
+		Set oUser=..%OpenId(userID)
+		If $IsObject(oUser)
+		{
+			Set name=oUser.Name
+			If '$Data(^VA(200,"B",name))
+			{
+				Set FDA(200,"+1,",".01")=name
+				Set:oUser.WriteRx FDA(200,"+1,","53.1")="Y"
+				Do UPDATE^DIE("","FDA","","MSG")
+				If $Get(MSG("DIERR","1","TEXT",1))]"" Write $Get(MSG("DIERR","1","TEXT",1)),!
+				Else  Write "."
+			}
+		}
+		Set userID=$Order(^apex.VANewPersonFileD(userID))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.VANewPersonFileD</DataLocation>
+<DefaultData>VANewPersonFileDefaultData</DefaultData>
+<IdLocation>^apex.VANewPersonFileD</IdLocation>
+<IndexLocation>^apex.VANewPersonFileI</IndexLocation>
+<StreamLocation>^apex.VANewPersonFileS</StreamLocation>
+<Data name="VANewPersonFileDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Name</Value>
+</Value>
+<Value name="3">
+<Value>Type</Value>
+</Value>
+<Value name="4">
+<Value>WriteRx</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

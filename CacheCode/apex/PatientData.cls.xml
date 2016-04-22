@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.PatientData">
+<Super>%Persistent,%Populate</Super>
+<TimeCreated>64023,6706.313849</TimeCreated>
+
+<Property name="Sta3n">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="CaseName">
+<Type>%String</Type>
+<Parameter name="COLLATION" value="EXACT"/>
+</Property>
+
+<Property name="LastName">
+<Type>%String</Type>
+</Property>
+
+<Property name="FirstName">
+<Type>%String</Type>
+</Property>
+
+<Property name="DateOfBirth">
+<Type>%TimeStamp</Type>
+</Property>
+
+<Property name="SSN">
+<Type>%String</Type>
+</Property>
+
+<Property name="Gender">
+<Type>%String</Type>
+</Property>
+
+<Property name="Race">
+<Type>%String</Type>
+</Property>
+
+<Property name="Ethnicity">
+<Type>%String</Type>
+</Property>
+
+<Property name="EmploymentStatus">
+<Type>%String</Type>
+</Property>
+
+<Property name="Occupation">
+<Type>%String</Type>
+</Property>
+
+<Property name="Insurance">
+<Type>%String</Type>
+</Property>
+
+<Property name="USVeteran">
+<Type>%String</Type>
+</Property>
+
+<Property name="DFN">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="ApexPatient">
+<Type>apex.Patient</Type>
+</Property>
+
+<Index name="Sta3nIndex">
+<Properties>Sta3n</Properties>
+</Index>
+
+<Index name="ApexPatientIndex">
+<Properties>ApexPatient</Properties>
+</Index>
+
+<Index name="CaseNameIndex">
+<Properties>Sta3n,CaseName</Properties>
+</Index>
+
+<Method name="PopulateDistinctPatient">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Write "Populating apex.Patient class with distinct patients...",!
+	Do ##class(apex.Patient).%KillExtent()
+	Do ##class(apex.Patient).Populate(100)
+	Set id=$Order(^apex.PatientDataD(0))
+	Set newPatId=0
+	Set newInsuranceID=38
+	while +id
+	{
+		Set oPat=..%OpenId(id)
+		Set Name=oPat.LastName_","_oPat.FirstName
+		Set DOB=oPat.DateOfBirth
+		If '$Data(^apex.PatientI("PatientNameIndex",Name))
+		{
+			//Write Name," ",DOB,!
+			Set newPatId=newPatId+1
+			Set oApexPat=##class(apex.Patient).%OpenId(newPatId)
+			Set oApexPat.Name=Name
+			Set oApexPat.DateOfBirth=$ZDateH(DOB,3)
+			Set oApexPat.Gender=$Extract(oPat.Gender)
+			Set oApexPat.Veteran=$Case(oPat.USVeteran,"Y":1,"N":0,:"")
+			Set oApexPat.EmploymentStatus=$Case(oPat.EmploymentStatus,"EMPLOYED FULL TIME":1,"EMPLOYED PART TIME":2,"NOT EMPLOYED":3,"SELF EMPLOYED":4,"RETIRED":5,"ACTIVE MILITARY DUTY":6,"UNKNOWN":9,:"")
+			Set race=oPat.Race
+			Set occupation=oPat.Occupation
+			Set insurance=oPat.Insurance
+			Set ethnicity=oPat.Ethnicity
+			Set employment=oPat.EmploymentStatus
+			If race]""
+			{
+				If $Length(race)=30 Set race=$Order(^apex.VARaceFileI("RaceIndex",$Length(race)))
+				If race]""
+				{
+					Set raceID=$Order(^apex.VARaceFileI("RaceIndex",race,0))
+					If 'raceID Write "Race: "_race_" not found...",!
+					Else  Set oApexPat.Race=##class(apex.VARaceFile).%OpenId(raceID)
+				}
+			}
+			Else
+			{
+				Set oApexPat.Race=""
+			}
+			If ethnicity]""
+			{
+				Set ethID=$Order(^apex.VAEthnicityFileI("EthnicityIndex",ethnicity,0))
+				If '+ethID Write "Ethnicity: "_ethnicity_" not found...",!
+				Else  Set oApexPat.Ethnicity=##class(apex.VAEthnicityFile).%OpenId(ethID)
+			}
+			Else
+			{
+				Set oApexPat.Ethnicity=""
+			}
+			if occupation]""
+			{
+				Set occId=$Order(^apex.OccupationDataI("OccupationIndex",occupation,0))
+				If '+occId
+				{
+					Set occ=##class(apex.OccupationData).%New()
+					Set occ.OccupationName=occupation
+					Do occ.%Save()
+				}
+				Else 
+				{
+					Set occ=##class(apex.OccupationData).%OpenId(occId)
+				}
+				Set:$IsObject(occ) oApexPat.Occupation=occ
+			}
+			Else
+			{
+				Set oApexPat.Occupation=""
+			}
+			If insurance]""
+			{
+				Set insId=$Order(^apex.InsuranceDataI("InsuranceIndex",insurance,0))
+				If '+insId
+				{
+					Set newInsuranceID=newInsuranceID+1
+					Set oIns=##class(apex.InsuranceData).%OpenId(newInsuranceID)
+					Set oIns.CompanyName=insurance
+					Do oIns.%Save()
+				}
+				Else
+				{
+				Set oIns=##class(apex.InsuranceData).%OpenId(insId)
+				}
+				Set:$IsObject(oIns) oApexPat.Insurance=oIns
+			}
+			Else
+			{
+				Set oApexPat.Insurance=""
+			}
+			
+			Do oApexPat.%Save()
+			Set oPat.ApexPatient=oApexPat
+			Set oPat.SSN=oApexPat.SSN
+			Do oPat.%Save()
+		}
+		Else
+		{
+			Set oApexId=$Order(^apex.PatientI("PatientNameIndex",Name,0))
+			If +oApexId
+			{
+				Set oApexPat=##class(apex.Patient).%OpenId(oApexId)
+				If (oPat.EmploymentStatus]"")&(oApexPat.EmploymentStatus="")
+				{
+					Set oApexPat.EmploymentStatus=$Case(oPat.EmploymentStatus,"EMPLOYED FULL TIME":1,"EMPLOYED PART TIME":2,"NOT EMPLOYED":3,"SELF EMPLOYED":4,"RETIRED":5,"ACTIVE MILITARY DUTY":6,"UNKNOWN":9,:"")
+				}
+				Set oPat.ApexPatient=oApexPat
+				Set oPat.SSN=oApexPat.SSN
+				Do oPat.%Save()
+			}
+		}
+		
+		Kill DOB,employment,ethID,ethnicity,insId,insurance,Name,oApexPat,occ,occId,occupation,oIns,oPat,race,raceID
+		Set id=$Order(^apex.PatientDataD(id))
+	}
+	Set tStatement=##class(%SQL.Statement).%New()
+	Set Status=tStatement.%Prepare("DELETE FROM apex.Patient WHERE ID>"_newPatId)
+	Do tStatement.%Execute()
+	Quit
+]]></Implementation>
+</Method>
+
+<Method name="PopulateVISTA">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Sta3n:%Integer</FormalSpec>
+<Implementation><![CDATA[
+	Set patID=$Order(^apex.PatientDataI("Sta3nIndex",Sta3n,0))
+	While +patID
+	{
+		
+		Set oPat=..%OpenId(patID)
+		Set oPatient=oPat.ApexPatient
+		Do oPatient.LoadVISTAPatient()
+		set DFN=$Order(^DPT("B",$ZCONVERT(oPatient.Name,"U"),0))
+		Set oPat.DFN=DFN
+		Set oPat.SSN=oPatient.SSN
+		Do oPat.%Save()
+		Set patID=$Order(^apex.PatientDataI("Sta3nIndex",Sta3n,patID))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.PatientDataD</DataLocation>
+<DefaultData>PatientDataDefaultData</DefaultData>
+<IdLocation>^apex.PatientDataD</IdLocation>
+<IndexLocation>^apex.PatientDataI</IndexLocation>
+<StreamLocation>^apex.PatientDataS</StreamLocation>
+<Data name="PatientDataDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>CaseName</Value>
+</Value>
+<Value name="3">
+<Value>LastName</Value>
+</Value>
+<Value name="4">
+<Value>FirstName</Value>
+</Value>
+<Value name="5">
+<Value>DateOfBirth</Value>
+</Value>
+<Value name="6">
+<Value>SSN</Value>
+</Value>
+<Value name="7">
+<Value>Gender</Value>
+</Value>
+<Value name="8">
+<Value>Race</Value>
+</Value>
+<Value name="9">
+<Value>Ethnicity</Value>
+</Value>
+<Value name="10">
+<Value>EmploymentStatus</Value>
+</Value>
+<Value name="11">
+<Value>Occupation</Value>
+</Value>
+<Value name="12">
+<Value>Insurance</Value>
+</Value>
+<Value name="13">
+<Value>USVeteran</Value>
+</Value>
+<Value name="14">
+<Value>Sta3n</Value>
+</Value>
+<Value name="15">
+<Value>DFN</Value>
+</Value>
+<Value name="16">
+<Value>ApexPatient</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

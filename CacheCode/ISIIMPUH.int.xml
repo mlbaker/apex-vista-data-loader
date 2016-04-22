@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Routine name="ISIIMPUH" type="INT" languagemode="0"><![CDATA[
+ISIIMPUH ;;ISI GROUP/MLS -- TREATING FACILITY LIST IMPORT Utility
+ ;;1.0;ISI;****;Jun 26,2012;Build 63
+ Q
+MISCDEF ;;+++++ DEFINITIONS OF MED MISC PARAMETERS +++++
+ ;;NAME             |TYPE       |FILE,FIELD |DESC
+ ;;-----------------------------------------------------------------------
+ ;;PAT_SSN          |FIELD      |2,.09      |Patient SSN (identifier)
+ ;;INST             |FIELD      |4,.01      |Institution where pt was last seen
+ ;;DATE             |FIELD      |           |Date pt was last seen
+]]></Routine>
+</Export>

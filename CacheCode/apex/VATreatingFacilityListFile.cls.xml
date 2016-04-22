@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.VATreatingFacilityListFile">
+<Super>%Persistent</Super>
+<TimeCreated>64024,2638.464627</TimeCreated>
+
+<Property name="Sta3n">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Patient">
+<Type>apex.Patient</Type>
+</Property>
+
+<Property name="Institution">
+<Type>apex.VAInstitutionFile</Type>
+</Property>
+
+<Property name="DateLastTreated">
+<Type>%Date</Type>
+</Property>
+
+<Index name="MainIndex">
+<Properties>Sta3n,Patient,Institution</Properties>
+</Index>
+
+<Method name="AddSiteRecords">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>HomeSta3n:%Integer</FormalSpec>
+<Implementation><![CDATA[
+	Set tStatement=##class(%SQL.Statement).%New()
+	Set Status=tStatement.%Prepare("DELETE FROM apex.VATreatingFacilityListFile WHERE Sta3n="_HomeSta3n)
+	Set Status=tStatement.%Execute()
+	Set Sta3n=$Order(^apex.PatientDataI("Sta3nIndex",0))
+	Write !,HomeSta3n
+	While +Sta3n
+	{
+		If Sta3n'=HomeSta3n
+		{
+			Set patID=$Order(^apex.PatientDataI("Sta3nIndex",Sta3n,0))
+			While +patID
+			{
+				Set oFac=..%New()
+				Set oPat=##class(apex.PatientData).%OpenId(patID)
+				Set oApexPat=oPat.ApexPatient
+				Set oFac.Patient=oApexPat
+				Set oFac.Sta3n=HomeSta3n
+				Set oinstID=$Order(^apex.VAInstitutionFileI("Sta3nIndex",oPat.Sta3n,0))
+				Set oFac.Institution=##class(apex.VAInstitutionFile).%OpenId(oinstID)
+				Set oFac.DateLastTreated=$Piece($H,",",1)-$Random(1000)
+				If '$Data(^apex.VATreatingF36BBI("MainIndex",HomeSta3n,oPat.ApexPatient.%Id(),oinstID))
+				{
+					Write:oFac.%Save() "."
+				}
+				Set patID=$Order(^apex.PatientDataI("Sta3nIndex",Sta3n,patID))
+			}
+		}
+		Set Sta3n=$Order(^apex.PatientDataI("Sta3nIndex",Sta3n))
+	}
+]]></Implementation>
+</Method>
+
+<Method name="PopulateAllSites">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Set HomeSta3n=$Order(^apex.VistaSiteD(0))
+	While +HomeSta3n
+	{
+		Set oSite=##class(apex.VistaSite).%OpenId(HomeSta3n)
+		Do:oSite.VistaPopulate ..AddSiteRecords(HomeSta3n)
+		Set HomeSta3n=$Order(^apex.VistaSiteD(HomeSta3n))
+	}
+]]></Implementation>
+</Method>
+
+<Method name="PopulateVISTA">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Sta3n:%Integer</FormalSpec>
+<PublicList>DUZ,DT,FDA,U,MSG,Sta3n</PublicList>
+<Implementation><![CDATA[
+	Set DUZ=1,DUZ(0)="@",DT=##class(%FilemanDate).DateToLogical($H)
+	Set oApexPatID=$Order(^apex.VATreatingF36BBI("MainIndex",Sta3n,0))
+	While +oApexPatID
+	{
+		Set oInstID=$Order(^apex.VATreatingF36BBI("MainIndex",Sta3n,oApexPatID,0))
+		While +oInstID
+		{
+			Set oTreatID=$Order(^apex.VATreatingF36BBI("MainIndex",Sta3n,oApexPatID,oInstID,0))
+			Set oTreat=..%OpenId(oTreatID)
+			If $IsObject(oTreat)
+			{
+				Set DFN=$Order(^DPT("B",oTreat.Patient.Name,0))
+				If +DFN
+				{
+					Set InstitutionIEN=oTreat.Institution.InstitutionIEN
+					If '$Data(^DGCN(391.91,"APAT",DFN,InstitutionIEN))
+					{
+						Set TreatDate=##class(%FilemanDate).DateToLogical(oTreat.DateLastTreated)
+						Set FDA(391.91,"+1,",.01)=DFN
+ 						Set FDA(391.91,"+1,",.02)=InstitutionIEN
+ 						Set FDA(391.91,"+1,",.03)=TreatDate
+ 						Do UPDATE^DIE("","FDA",,"MSG")
+ 						Write "."
+					}
+					Else
+					{
+						Write "Record already exists for this Patient and Institution.",!
+					}
+				}
+			}
+			Set oInstID=$Order(^apex.VATreatingF36BBI("MainIndex",Sta3n,oApexPatID,oInstID))
+		}
+		Set oApexPatID=$Order(^apex.VATreatingF36BBI("MainIndex",Sta3n,oApexPatID))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.VATreatingF36BBD</DataLocation>
+<DefaultData>VATreatingFacilityListFileDefaultData</DefaultData>
+<IdLocation>^apex.VATreatingF36BBD</IdLocation>
+<IndexLocation>^apex.VATreatingF36BBI</IndexLocation>
+<StreamLocation>^apex.VATreatingF36BBS</StreamLocation>
+<Data name="VATreatingFacilityListFileDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Sta3n</Value>
+</Value>
+<Value name="3">
+<Value>Patient</Value>
+</Value>
+<Value name="4">
+<Value>Institution</Value>
+</Value>
+<Value name="5">
+<Value>DateLastTreated</Value>
+</Value>
+<Value name="6">
+<Value>DFN</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

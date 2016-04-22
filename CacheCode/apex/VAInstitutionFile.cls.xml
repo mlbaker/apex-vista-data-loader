@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.VAInstitutionFile">
+<Super>%Persistent</Super>
+<TimeCreated>64024,124.079096</TimeCreated>
+
+<Property name="StationNumber">
+<Type>%String</Type>
+<Parameter name="COLLATION" value="EXACT"/>
+</Property>
+
+<Property name="StationName">
+<Type>%String</Type>
+</Property>
+
+<Property name="State">
+<Type>%String</Type>
+</Property>
+
+<Property name="District">
+<Type>%String</Type>
+</Property>
+
+<Property name="ShortName">
+<Type>%String</Type>
+</Property>
+
+<Index name="Sta3nIndex">
+<Properties>StationNumber</Properties>
+</Index>
+
+<Property name="InstitutionIEN">
+<Type>%Integer</Type>
+</Property>
+
+<Index name="MainIndex">
+<IdKey>1</IdKey>
+<PrimaryKey>1</PrimaryKey>
+<Properties>InstitutionIEN</Properties>
+<Unique>1</Unique>
+</Index>
+
+<Method name="Populate">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Do ..%KillExtent()
+	Set ien=$Order(^DIC(4,0))
+	While +ien
+	{
+		Set oInst=..%New()
+		Set oInst.InstitutionIEN=ien
+		Set oInst.StationName=$Piece($Get(^DIC(4,ien,0)),"^",1)
+		Set StateIEN=$Piece($Get(^DIC(4,ien,0)),"^",2)
+		Set:+StateIEN oInst.State=$Piece($Get(^DIC(5,StateIEN,0)),"^",1)
+		Set oInst.District=$Piece($Get(^DIC(4,ien,0)),"^",3)
+		Set oInst.ShortName=$Piece($Get(^DIC(4,ien,0)),"^",4)
+		Set Sta3n=$Piece($Get(^DIC(4,ien,99)),"^",1)
+		Set:+Sta3n oInst.StationNumber=Sta3n
+		Write:oInst.%Save() "."
+		Set ien=$Order(^DIC(4,ien))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.VAInstitutionFileD</DataLocation>
+<DefaultData>VAInstitutionFileDefaultData</DefaultData>
+<IdLocation>^apex.VAInstitutionFileD</IdLocation>
+<IndexLocation>^apex.VAInstitutionFileI</IndexLocation>
+<StreamLocation>^apex.VAInstitutionFileS</StreamLocation>
+<Data name="VAInstitutionFileDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>StationNumber</Value>
+</Value>
+<Value name="3">
+<Value>StationName</Value>
+</Value>
+<Value name="4">
+<Value>State</Value>
+</Value>
+<Value name="5">
+<Value>District</Value>
+</Value>
+<Value name="6">
+<Value>ShortName</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.VARaceFile">
+<Description>
+A Class that contains all of the Race records from the RACE File # 10</Description>
+<Super>%Persistent</Super>
+<TimeCreated>64023,60524.387641</TimeCreated>
+
+<Property name="Race">
+<Type>%String</Type>
+<Parameter name="COLLATION" value="EXACT"/>
+</Property>
+
+<Property name="Abbreviation">
+<Type>%String</Type>
+</Property>
+
+<Property name="HL7Value">
+<Type>%String</Type>
+</Property>
+
+<Property name="CDCValue">
+<Type>%String</Type>
+</Property>
+
+<Property name="PTFValue">
+<Type>%String</Type>
+</Property>
+
+<Property name="Inactive">
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="InactivationDate">
+<Type>%Date</Type>
+</Property>
+
+<Index name="RaceIndex">
+<Properties>Race</Properties>
+</Index>
+
+<Method name="Populate">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Write "Initializing VARaceFile Data...",!
+	Write "Deleting old Data...",!
+	Do ..%KillExtent()
+	Write "Adding new Data...",!
+	Set D0=$Order(^DIC(10,0))
+	While +D0
+	{
+		Set oRace=..%New()
+		Set oRace.Race=$Piece($Get(^DIC(10,D0,0)),"^",1) 
+		Set oRace.Abbreviation=$Piece($Get(^DIC(10,D0,0)),"^",2)
+		Set oRace.HL7Value=$Piece($Get(^DIC(10,D0,0)),"^",3)
+		Set oRace.CDCValue=$Piece($Get(^DIC(10,D0,0)),"^",4)
+		Set oRace.PTFValue=$Piece($Get(^DIC(10,D0,0)),"^",5)
+		Set oRace.Inactive=$Piece($Get(^DIC(10,D0,.02)),"^",1)
+		Set InactiveDate=$Piece($Get(^DIC(10,D0,.02)),"^",2)
+		Set:+InactiveDate oRace.InactivationDate=##class(%FilemanDate).LogicalToDate(InactiveDate)
+		Write:oRace.%Save() "."
+		Set D0=$Order(^DIC(10,D0))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.VARaceFileD</DataLocation>
+<DefaultData>VARaceFileDefaultData</DefaultData>
+<IdLocation>^apex.VARaceFileD</IdLocation>
+<IndexLocation>^apex.VARaceFileI</IndexLocation>
+<StreamLocation>^apex.VARaceFileS</StreamLocation>
+<Data name="VARaceFileDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Race</Value>
+</Value>
+<Value name="3">
+<Value>Abbreviation</Value>
+</Value>
+<Value name="4">
+<Value>HL7Value</Value>
+</Value>
+<Value name="5">
+<Value>CDCValue</Value>
+</Value>
+<Value name="6">
+<Value>PTFValue</Value>
+</Value>
+<Value name="7">
+<Value>Inactive</Value>
+</Value>
+<Value name="8">
+<Value>InactivationDate</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

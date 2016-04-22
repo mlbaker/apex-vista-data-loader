@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.VATypeOfPatientFile">
+<Description>
+A Class that contains all of the Patient Types From the TYPE OF PATIENT File # 391</Description>
+<Super>%Persistent</Super>
+<TimeCreated>64023,61332.14896</TimeCreated>
+
+<Property name="TypeOfPatient">
+<Type>%String</Type>
+</Property>
+
+<Property name="IgnoreVeteranChecks">
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="InfoToAsk">
+<Type>%String</Type>
+</Property>
+
+<Property name="MakeRecordSensitive">
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="IsVeteran">
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="IDFormat">
+<Type>%String</Type>
+</Property>
+
+<Property name="NewPatientInputDR">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="250"/>
+</Property>
+
+<Method name="Populate">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Write "Initializing VATypeOfPatientFile Data...",!
+	Write "Deleting old Data...",!
+	Do ..%KillExtent()
+	Write "Adding new Data...",!
+	Set D0=$Order(^DG(391,0))
+	While +D0
+	{
+		Set oType=..%New()
+		Set oType.TypeOfPatient=$Piece($Get(^DG(391,D0,0)),"^",1) 
+		Set oType.IgnoreVeteranChecks=$Piece($Get(^DG(391,D0,0)),"^",2)
+		Set oType.InfoToAsk=$Piece($Get(^DG(391,D0,0)),"^",3)
+		Set oType.MakeRecordSensitive=$Piece($Get(^DG(391,D0,0)),"^",4)
+		Set oType.IsVeteran=$Piece($Get(^DG(391,D0,0)),"^",5)
+		Set IDFormatIEN=$Piece($Get(^DG(391,D0,0)),"^",5)
+		If +IDFormatIEN
+		{
+			Set oType.IDFormat=$Piece($Get(^DIC(8.2,IDFormatIEN,0)),"^",1)
+		}
+		Set oType.NewPatientInputDR=$Get(^DG(391,D0,"DR"))
+		Write:oType.%Save() "."
+		Set D0=$Order(^DG(391,D0))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.VATypeOfPatientFileD</DataLocation>
+<DefaultData>VATypeOfPatientFileDefaultData</DefaultData>
+<IdLocation>^apex.VATypeOfPatientFileD</IdLocation>
+<IndexLocation>^apex.VATypeOfPatientFileI</IndexLocation>
+<StreamLocation>^apex.VATypeOfPatientFileS</StreamLocation>
+<Data name="VATypeOfPatientFileDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>TypeOfPatient</Value>
+</Value>
+<Value name="3">
+<Value>IgnoreVeteranChecks</Value>
+</Value>
+<Value name="4">
+<Value>InfoToAsk</Value>
+</Value>
+<Value name="5">
+<Value>MakeRecordSensitive</Value>
+</Value>
+<Value name="6">
+<Value>IsVeteran</Value>
+</Value>
+<Value name="7">
+<Value>IDFormat</Value>
+</Value>
+<Value name="8">
+<Value>NewPatientInputDR</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

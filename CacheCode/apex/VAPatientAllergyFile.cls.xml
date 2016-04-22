@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.VAPatientAllergyFile">
+<Description>
+A Class to populate the Patient Allergy File #120.8 From the apex.AllergyData objects</Description>
+<Super>%Persistent</Super>
+<TimeCreated>64027,2981.992793</TimeCreated>
+
+<Method name="PopulateVISTA">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>Sta3n:%Integer</FormalSpec>
+<PublicList>DUZ,DT,FDA,U,MSG,XWBOS</PublicList>
+<Implementation><![CDATA[
+	Set DUZ=1,DUZ(0)="@",DT=##class(%FilemanDate).DateToLogical($H),U="^"
+	Set XWBOS=1 //remove line to have observed allergies creat a progress note.
+	Set AllergyID=$Order(^apex.AllergyDataI("Sta3nIndex",Sta3n,0))
+	While +AllergyID
+	{
+		//Write AllergyID,!
+		Set oAllergy=##class(apex.AllergyData).%OpenId(AllergyID)
+		If $IsObject(oAllergy)
+		{
+			Set SSN=$Replace(oAllergy.SSN,"-","")
+			//Write SSN,!
+			Set dfn=oAllergy.DFN
+			
+			If +dfn
+			{
+				If '$Data(^DPT("SSN",SSN,dfn))
+				{
+					Write "PatientSSN has been changed for PatientNumber: ",dfn,!
+				}
+				Else
+				{
+					//Write dfn,!
+					Set MISC(0)="ALLERGEN^"_oAllergy.Allergen
+					If oAllergy.Symptom]""
+					{
+ 						Set MISC(1)="SYMPTOM^"_oAllergy.Symptom
+					}
+					Else
+					{
+						Set MISC(1)="SYMPTOM^RASH"
+					}
+ 					Set MISC(2)="PAT_SSN^"_SSN
+ 					Set MISC(3)="ORIG_DATE^"_oAllergy.OriginationDate
+ 					If '$Data(^VA(200,"B",oAllergy.EnteredBy))
+ 					{
+	 					Set MISC(4)="ORIGINTR^"_$Piece($Get(^VA(200,1,0)),"^",1)
+ 					}
+ 					Else
+ 					{
+ 						Set MISC(4)="ORIGINTR^"_oAllergy.EnteredBy
+ 					}
+ 					If oAllergy.Observed]""
+ 					{
+						Set MISC(5)="HISTORIC^"_oAllergy.Observed
+ 					}
+ 					Else
+ 					{
+	 					Set MISC(5)="HISTORIC^Historical"
+ 					}
+					If oAllergy.ObservedDate]""
+					{
+						Set MISC(6)="OBSRV_DT^"_oAllergy.ObservedDate
+					}
+					//ZW MISC
+ 				
+ 					//Write !!!,"ALGMISC^ISIIMPU6",!!!
+					Set Status=$$ALGMISC^ISIIMPU6(.MISC,.ISIIMSC)
+					If Status'<0
+					{
+						Set Status=$$VALALG^ISIIMPU6(.ISIIMSC)
+			 			If Status'<0 
+			 			{
+				 			Set Status=$$IMPRTALG^ISIIMP11(.ISIIMSC)
+				 			Write "."
+			 			}
+			 			Else
+			 			{
+				 			WRite "VALIDATE",Status,!
+				 			//ZW MISC
+			 			}
+					}
+					Else
+					{
+						WRite "SETUP ",Status,!
+					//ZW MISC
+					}
+				}
+			}	 
+		}
+		Else
+		{
+			Quit
+		}
+		Set AllergyID=$Order(^apex.AllergyDataI("Sta3nIndex",Sta3n,AllergyID))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.VAPatientAllergyFileD</DataLocation>
+<DefaultData>VAPatientAllergyFileDefaultData</DefaultData>
+<IdLocation>^apex.VAPatientAllergyFileD</IdLocation>
+<IndexLocation>^apex.VAPatientAllergyFileI</IndexLocation>
+<StreamLocation>^apex.VAPatientAllergyFileS</StreamLocation>
+<Data name="VAPatientAllergyFileDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

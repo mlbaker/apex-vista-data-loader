@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.InsuranceData">
+<Super>%Persistent,%Populate</Super>
+<TimeCreated>64023,60921.352071</TimeCreated>
+
+<Property name="CompanyName">
+<Type>%String</Type>
+<Parameter name="COLLATION" value="EXACT"/>
+</Property>
+
+<Property name="Reimburse">
+<Type>%String</Type>
+<Parameter name="DISPLAYLIST" value=",WILL REIMBURSE,WILL REIMBURSE IF TREATED UNDER VAR 6046(C) OR VAR 6060.2(A),DEPENDS ON POLICY - CHECK WITH COMPANY,WILL NOT REIMBURSE;"/>
+<Parameter name="VALUELIST" value=",Y,*,**,N"/>
+</Property>
+
+<Property name="Street">
+<Type>%String</Type>
+</Property>
+
+<Property name="City">
+<Type>%String</Type>
+</Property>
+
+<Property name="State">
+<Type>%String</Type>
+</Property>
+
+<Property name="Zip">
+<Type>%String</Type>
+</Property>
+
+<Property name="Phone">
+<Type>%String</Type>
+</Property>
+
+<Index name="InsuranceIndex">
+<Properties>CompanyName</Properties>
+</Index>
+
+<Method name="AddCompany">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>ien:%Integer,CompanyName:%String</FormalSpec>
+<Implementation><![CDATA[
+	Set oCompany=..%OpenId(ien)
+	Set oCompany.CompanyName=CompanyName
+	Do oCompany.%Save()
+	Write "."
+]]></Implementation>
+</Method>
+
+<Method name="InitialPopulate">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Write "Initializing Insurance Data...",!
+	Do ..%KillExtent()
+	Do ..Populate(100)
+	For i=5:1 Set name=$Piece($Text(zInitialPopulate+i),";",3) Quit:name="EOL"  Do ..AddCompany(i-3,$ZCONVERT(name,"U"))
+	;;AARP
+	;;Aetna
+	;;American Family Insurance
+	;;Anthem Blue Cross and Blue Shield
+	;;Blue Cross and Blue Shield Association
+	;;Cambia Health Solutions
+	;;Centene Corporation
+	;;Cigna
+	;;Coventry Health Care
+	;;EmblemHealth
+	;;Fortis
+	;;Golden Rule Insurance Company
+	;;Group Health Cooperative
+	;;Group Health Incorporated
+	;;Health Net
+	;;HealthMarkets
+	;;HealthPartners
+	;;HealthSpring
+	;;Highmark
+	;;Humana
+	;;Independence Blue Cross
+	;;Kaiser Permanente
+	;;Kaleida Health
+	;;LifeWise Health Plan of Oregon
+	;;Medica
+	;;Medical Mutual of Ohio
+	;;Molina Healthcare
+	;;Premera Blue Cross
+	;;Principal Financial Group
+	;;Shelter Insurance
+	;;State Farm
+	;;Thrivent Financial for Lutherans
+	;;UnitedHealth Group
+	;;Unitrin
+	;;Universal American Corporation
+	;;WellCare Health Plans
+	;;WellPoint
+	;;EOL
+]]></Implementation>
+</Method>
+
+<Method name="LoadVISTAInsurance">
+<ClassMethod>1</ClassMethod>
+<PublicList>DUZ,DT,FDA,U,MSG</PublicList>
+<Implementation><![CDATA[
+	Set oid=$Order(^apex.InsuranceDataD(0))
+	While +oid
+	{
+		Set DUZ=1,DUZ(0)="@",DT=##class(%FilemanDate).DateToLogical($H),U="^"
+		Set oCompany=..%OpenId(oid)
+		If $Order(^DIC(36,"B",$Extract($ZCONVERT(oCompany.CompanyName,"U"),1,30),0))=""
+		{
+			
+			Set FDA(36,"+1,",.01)=$ZCONVERT(oCompany.CompanyName,"U")
+			Set FDA(36,"+1,",1)=oCompany.Reimburse
+			Set FDA(36,"+1,",.111)=$ZCONVERT(oCompany.Street,"U")
+			Set FDA(36,"+1,",.113)=$ZCONVERT(oCompany.City,"U")
+			Set FDA(36,"+1,",.114)=$Order(^DIC(5,"C",$ZCONVERT(oCompany.State,"U"),0))
+			Set FDA(36,"+1,",.116)=oCompany.Zip	
+			Do UPDATE^DIE("","FDA",,"MSG")
+			If $Get(MSG("DIERR","1","TEXT",1))]"" WRite $Get(MSG("DIERR","1","TEXT",1)),!
+			Else  Write "."
+		}
+		Set oid=$Order(^apex.InsuranceDataD(oid))	
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.InsuranceDataD</DataLocation>
+<DefaultData>InsuranceDataDefaultData</DefaultData>
+<IdLocation>^apex.InsuranceDataD</IdLocation>
+<IndexLocation>^apex.InsuranceDataI</IndexLocation>
+<StreamLocation>^apex.InsuranceDataS</StreamLocation>
+<ExtentSize>100</ExtentSize>
+<Data name="InsuranceDataDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>CompanyName</Value>
+</Value>
+<Value name="3">
+<Value>Reimburse</Value>
+</Value>
+<Value name="4">
+<Value>Street</Value>
+</Value>
+<Value name="5">
+<Value>City</Value>
+</Value>
+<Value name="6">
+<Value>State</Value>
+</Value>
+<Value name="7">
+<Value>Zip</Value>
+</Value>
+<Value name="8">
+<Value>Phone</Value>
+</Value>
+</Data>
+<Property name="%%CLASSNAME">
+<Selectivity>100.0000%</Selectivity>
+<AverageFieldSize>1</AverageFieldSize>
+</Property>
+<Property name="%%ID">
+<Selectivity>1</Selectivity>
+<AverageFieldSize>1.92</AverageFieldSize>
+</Property>
+<Property name="City">
+<Selectivity>4.3478%</Selectivity>
+<AverageFieldSize>7.32</AverageFieldSize>
+</Property>
+<Property name="CompanyName">
+<Selectivity>1.0000%</Selectivity>
+<AverageFieldSize>4.9</AverageFieldSize>
+</Property>
+<Property name="Phone">
+<Selectivity>1.0000%</Selectivity>
+<AverageFieldSize>12</AverageFieldSize>
+</Property>
+<Property name="Reimburse">
+<Selectivity>25.0000%</Selectivity>
+<AverageFieldSize>1.21</AverageFieldSize>
+</Property>
+<Property name="State">
+<Selectivity>2.1739%</Selectivity>
+<AverageFieldSize>2</AverageFieldSize>
+</Property>
+<Property name="Street">
+<Selectivity>1.0101%</Selectivity>
+<AverageFieldSize>16.75</AverageFieldSize>
+</Property>
+<Property name="Zip">
+<Selectivity>1.0000%</Selectivity>
+<AverageFieldSize>5</AverageFieldSize>
+</Property>
+<SQLMap name="IDKEY">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+<SQLMap name="InsuranceIndex">
+<BlockCount>-4</BlockCount>
+</SQLMap>
+</Storage>
+</Class>
+</Export>

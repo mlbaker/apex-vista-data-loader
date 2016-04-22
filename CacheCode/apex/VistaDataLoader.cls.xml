@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.VistaDataLoader">
+<Super>%Persistent</Super>
+<TimeCreated>64023,80351.094737</TimeCreated>
+
+<Property name="Sta3n">
+<Type>apex.VistaSite</Type>
+</Property>
+
+<Index name="MainIndex">
+<IdKey>1</IdKey>
+<PrimaryKey>1</PrimaryKey>
+<Properties>Sta3n</Properties>
+<Unique>1</Unique>
+</Index>
+
+<Method name="PopulateVISTA">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Do ##class(apex.VANewPersonFile).PopulateFromAllergy()
+	Set Sta3n=$Order(^apex.VistaSiteD(0))
+	While +Sta3n
+	{
+		Set site=##class(apex.VistaSite).%OpenId(Sta3n)
+		Set ns=site.CacheNamespace
+		If site.VistaPopulate
+		{
+			Write ns,!
+			ZN ns
+			Write !,"Populating Insurance File #36",!
+			Do ##class(apex.InsuranceData).LoadVISTAInsurance()
+			Write !!,"Populating Patient File #2",!
+			Do ##class(apex.PatientData).PopulateVISTA(Sta3n)
+			WRite !!
+			Write !!,"Populating Patient Treatment File #391.91",!
+			Do ##class(apex.VATreatingFacilityListFile).PopulateVISTA(Sta3n)
+			Write !!
+			Write !!,"Populating New Person File #200",!
+			Do ##class(apex.VANewPersonFile).PopulateVISTA(Sta3n)
+			Write !!			
+		}
+		Set Sta3n=$Order(^apex.VistaSiteD(Sta3n))
+	}
+	ZN "apex"
+	// Find Patients in Allergy data based on CaseName and Sta3n and populate remaining Allergy Data.
+	Do ##class(apex.AllergyData).FindPatients()
+	// Find Patients in Medication data based on CaseName and Sta3n and populate remaining Medication Data.
+	Do ##class(apex.MedicationData).FindPatients()
+	Set Sta3n=$Order(^apex.VistaSiteD(0))
+	While +Sta3n
+	{
+		Set site=##class(apex.VistaSite).%OpenId(Sta3n)
+		Set ns=site.CacheNamespace
+		If site.VistaPopulate
+		{
+			Write ns,!
+			ZN ns
+			Write !,"Populating Patient Allergy File #120.8",!
+			Do ##class(apex.VAPatientAllergyFile).PopulateVISTA(Sta3n)
+		}
+		Set Sta3n=$Order(^apex.VistaSiteD(Sta3n))
+	}
+	ZN "apex"
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.VistaDataLoaderD</DataLocation>
+<DefaultData>VistaDataLoaderDefaultData</DefaultData>
+<IdLocation>^apex.VistaDataLoaderD</IdLocation>
+<IndexLocation>^apex.VistaDataLoaderI</IndexLocation>
+<StreamLocation>^apex.VistaDataLoaderS</StreamLocation>
+<Data name="VistaDataLoaderDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

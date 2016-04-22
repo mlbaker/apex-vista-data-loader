@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.VAEthnicityFile">
+<Description>
+A Class that contains all of the Ethnicity records from the ETHNICITY File # 10.2</Description>
+<Super>%Persistent</Super>
+<TimeCreated>64023,60782.351108</TimeCreated>
+
+<Property name="Ethnicity">
+<Type>%String</Type>
+<Parameter name="COLLATION" value="EXACT"/>
+</Property>
+
+<Property name="Abbreviation">
+<Type>%String</Type>
+</Property>
+
+<Property name="HL7Value">
+<Type>%String</Type>
+</Property>
+
+<Property name="CDCValue">
+<Type>%String</Type>
+</Property>
+
+<Property name="PTFValue">
+<Type>%String</Type>
+</Property>
+
+<Property name="Inactive">
+<Type>%Boolean</Type>
+</Property>
+
+<Property name="InactivationDate">
+<Type>%Date</Type>
+</Property>
+
+<Index name="EthnicityIndex">
+<Properties>Ethnicity</Properties>
+</Index>
+
+<Method name="Populate">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Write "Initializing VAEthnicityFile Data...",!
+	Write "Deleting old Data...",!
+	Do ..%KillExtent()
+	Write "Adding new Data...",!
+	Set D0=$Order(^DIC(10.2,0))
+	While +D0
+	{
+		Set oEthn=..%New()
+		Set oEthn.Ethnicity=$Piece($Get(^DIC(10.2,D0,0)),"^",1) 
+		Set oEthn.Abbreviation=$Piece($Get(^DIC(10.2,D0,0)),"^",2)
+		Set oEthn.HL7Value=$Piece($Get(^DIC(10.2,D0,0)),"^",3)
+		Set oEthn.CDCValue=$Piece($Get(^DIC(10.2,D0,0)),"^",4)
+		Set oEthn.PTFValue=$Piece($Get(^DIC(10.2,D0,0)),"^",5)
+		Set oEthn.Inactive=$Piece($Get(^DIC(10.2,D0,.02)),"^",1)
+		Set InactiveDate=$Piece($Get(^DIC(10.2,D0,.02)),"^",2)
+		Set:+InactiveDate oEthn.InactivationDate=##class(%FilemanDate).LogicalToDate(InactiveDate)
+		Write:oEthn.%Save() "."
+		Set D0=$Order(^DIC(10.2,D0))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.VAEthnicityFileD</DataLocation>
+<DefaultData>VAEthnicityFileDefaultData</DefaultData>
+<IdLocation>^apex.VAEthnicityFileD</IdLocation>
+<IndexLocation>^apex.VAEthnicityFileI</IndexLocation>
+<StreamLocation>^apex.VAEthnicityFileS</StreamLocation>
+<Data name="VAEthnicityFileDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Ethnicity</Value>
+</Value>
+<Value name="3">
+<Value>Abbreviation</Value>
+</Value>
+<Value name="4">
+<Value>HL7Value</Value>
+</Value>
+<Value name="5">
+<Value>CDCValue</Value>
+</Value>
+<Value name="6">
+<Value>PTFValue</Value>
+</Value>
+<Value name="7">
+<Value>Inactive</Value>
+</Value>
+<Value name="8">
+<Value>InactivationDate</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Routine name="APEXINIT" type="MAC" languagemode="0"><![CDATA[
+APEXINIT	; Initialize APEX Classes
+	;
+ALL	; Initilaize everything and Populate VISTA databases.
+	; Initialize all apex classes with data FROM VISTA.
+	If $NAMESPACE="APEX" ZN "BAYPINES"
+	Do Site,Insurance,Occupation,Ethnicity,Marital,Race,Type,Institution
+	; Initialize apex.Patient Class with data from excel
+	Do Patient
+	; Populate apex.TreatingFacilityListFile Class with Data from apex.PatientData
+	Do Treat
+	; Populate VISTA Files.
+	Do VISTA
+	Quit
+Site	; Initialize apex.VistaSite class with data.
+	Do ##class(apex.VistaSite).Initialize()
+	Write !
+	Quit
+Insurance	; Initialize apex.InsuranceData class with data.
+	Do ##class(apex.InsuranceData).InitialPopulate()
+	Write !!
+	Quit	
+Occupation	; Initialize apex.OccupationData class with data.
+	Do ##class(apex.OccupationData).Populate()
+	Write !!
+	Quit
+Ethnicity	; Initialize apex.VAEthnicityFile class with data from VISTA system.
+	Do ##class(apex.VAEthnicityFile).Populate()
+	Write !!
+	Quit
+Marital	; Initialize apex.VAMaritalStatusFile class with data from VISTA system.
+	Do ##class(apex.VAMaritalStatusFile).Populate()
+	Write !!
+	Quit
+Race	; Initialize apex.VARaceFile class with data from VISTA system.
+	Do ##class(apex.VARaceFile).Populate()
+	Write !!
+	Quit
+Type	; Initialize apex.VATypeOfPatientFile class with data from VISTA system.
+	Do ##class(apex.VATypeOfPatientFile).Populate()
+	Write !!
+	Quit
+Institution ; Initialize apex.VAInstitutionFile class with data from VISTA system.
+	Do ##class(apex.VAInstitutionFile).Populate()
+	Write !!
+	Quit
+Patient ; Initialize apex.Patient class with data from apex.PatientData which is Populated from excel.
+	Do ##class(apex.PatientData).PopulateDistinctPatient()
+	Write !!
+	Quit
+Treat	; Initialize apex.VATreatingFacilityListFile class with data from apex.PatientData.
+	Do ##class(apex.VATreatingFacilityListFile).PopulateAllSites()
+	Write !!
+	Quit
+VISTA	; Populate Vista Systems using data from apex classes
+	Do ##class(apex.VistaDataLoader).PopulateVISTA()
+	Write !!
+	Quit
+
+
+	
+]]></Routine>
+</Export>

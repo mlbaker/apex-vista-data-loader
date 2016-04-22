@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.AllergyData">
+<Super>%Persistent,%Populate</Super>
+<TimeCreated>64026,66068.937535</TimeCreated>
+
+<Property name="Sta3n">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="CaseName">
+<Type>%String</Type>
+</Property>
+
+<Property name="SSN">
+<Type>%String</Type>
+</Property>
+
+<Property name="Allergen">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="200"/>
+</Property>
+
+<Property name="Symptom">
+<Type>%String</Type>
+<Parameter name="MAXLEN" value="200"/>
+</Property>
+
+<Property name="Observed">
+<Type>%String</Type>
+</Property>
+
+<Property name="ObservedDate">
+<Type>%String</Type>
+</Property>
+
+<Property name="OriginationDate">
+<Type>%String</Type>
+</Property>
+
+<Property name="EnteredBy">
+<Type>%String</Type>
+</Property>
+
+<Property name="Patient">
+<Type>apex.Patient</Type>
+</Property>
+
+<Property name="DFN">
+<Type>%Integer</Type>
+</Property>
+
+<Index name="Sta3nIndex">
+<Properties>Sta3n</Properties>
+</Index>
+
+<Method name="FindPatients">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Set id =$Order(^apex.AllergyDataD(0))
+	While +id
+	{
+		Set oAllergy=##class(AllergyData).%OpenId(id)
+		If $IsObject(oAllergy)
+		{
+			Set CaseName=oAllergy.CaseName
+			Set Sta3n=oAllergy.Sta3n
+			Set PatID=$Order(^apex.PatientDataI("CaseNameIndex",Sta3n,CaseName,0))
+			//Write PatID,!
+			If +PatID
+			{
+				Set oPat=##class(PatientData).%OpenId(PatID)
+				If $IsObject(oPat)
+				{
+					Set oAllergy.SSN=oPat.ApexPatient.SSN
+					Set oAllergy.Patient=oPat.ApexPatient
+					Set oAllergy.DFN=oPat.DFN
+					Write:oAllergy.%Save() "."
+				}
+			}
+		}
+		Set id =$Order(^apex.AllergyDataD(id))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.AllergyDataD</DataLocation>
+<DefaultData>AllergyDataDefaultData</DefaultData>
+<IdLocation>^apex.AllergyDataD</IdLocation>
+<IndexLocation>^apex.AllergyDataI</IndexLocation>
+<StreamLocation>^apex.AllergyDataS</StreamLocation>
+<Data name="AllergyDataDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>Sta3n</Value>
+</Value>
+<Value name="3">
+<Value>SSN</Value>
+</Value>
+<Value name="4">
+<Value>Allergen</Value>
+</Value>
+<Value name="5">
+<Value>Symptom</Value>
+</Value>
+<Value name="6">
+<Value>Observed</Value>
+</Value>
+<Value name="7">
+<Value>ObservedDate</Value>
+</Value>
+<Value name="8">
+<Value>OriginationDate</Value>
+</Value>
+<Value name="9">
+<Value>EnteredBy</Value>
+</Value>
+<Value name="10">
+<Value>CaseName</Value>
+</Value>
+<Value name="11">
+<Value>Patient</Value>
+</Value>
+<Value name="12">
+<Value>DFN</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

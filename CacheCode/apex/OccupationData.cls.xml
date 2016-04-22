@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.OccupationData">
+<Super>%Persistent</Super>
+<TimeCreated>64023,61125.587919</TimeCreated>
+
+<Property name="OccupationName">
+<Type>%String</Type>
+<Parameter name="COLLATION" value="EXACT"/>
+</Property>
+
+<Index name="OccupationIndex">
+<Properties>OccupationName</Properties>
+</Index>
+
+<Method name="AddOccupation">
+<ClassMethod>1</ClassMethod>
+<FormalSpec>OccupationName:%String</FormalSpec>
+<Implementation><![CDATA[
+	Set oOccupation=..%New()
+	Set oOccupation.OccupationName=OccupationName
+	Do oOccupation.%Save()
+	Write "."
+]]></Implementation>
+</Method>
+
+<Method name="Populate">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Write "Initializing Occupation Data...",!
+	Do ..%KillExtent()
+	For i=4:1 Set name=$Piece($Text(zPopulate+i),";",3) Quit:name="EOL"  Do ..AddOccupation($ZCONVERT(name,"U"))
+	;;Able Seamen
+	;;Administrative Assistant
+	;;Advertising Account Executive
+	;;Aeronautical & Aerospace Engineer
+	;;Air Traffic Controller
+	;;Airport Administrator
+	;;Art Appraiser
+	;;Bank Examiner
+	;;Biology Professor
+	;;Biomedical Engineer
+	;;Budget Analyst
+	;;Camp Director
+	;;Casino Cashier
+	;;Chemical Engineer
+	;;Chief Financial Officer
+	;;University Professor
+	;;Computer Programmer
+	;;Computer Software Engineers
+	;;Court Clerk
+	;;Customs Inspector
+	;;Dental Hygienist
+	;;Dentist (MD)
+	;;Electrical Engineers
+	;;Elevator Mechanic
+	;;Explosives Worker
+	;;Farm Hand
+	;;File Clerk
+	;;Fire Inspector
+	;;Funeral Director
+	;;Glass Blower
+	;;Harbor Master
+	;;Hospital Administrator
+	;;Hospital Nurse
+	;;Hotel Manager
+	;;Industrial Engineer
+	;;Insurance Claim Examiner
+	;;Laboratory Tester
+	;;Law Clerks
+	;;Loan Officer
+	;;Marine Architect
+	;;Mechanical Engineer
+	;;Medical Photographer
+	;;Mining Engineer
+	;;Music Therapist
+	;;Office Clerk
+	;;Personnel Assistant
+	;;Physician's Assistant (PA)
+	;;Police Officer
+	;;Property Accountant
+	;;Quarry Worker
+	;;Radio Operators
+	;;Real Estate Lawyer
+	;;Restaurant Manager
+	;;Screen Writer
+	;;Ship Mate
+	;;Social Worker
+	;;Sports Agent
+	;;Systems Accountant
+	;;Teachers Aide
+	;;Travel Agent
+	;;Watch Repairers
+	;;Zoologist
+	;;EOL
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.OccupationDataD</DataLocation>
+<DefaultData>OccupationDataDefaultData</DefaultData>
+<IdLocation>^apex.OccupationDataD</IdLocation>
+<IndexLocation>^apex.OccupationDataI</IndexLocation>
+<StreamLocation>^apex.OccupationDataS</StreamLocation>
+<Data name="OccupationDataDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>OccupationName</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>

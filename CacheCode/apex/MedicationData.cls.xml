@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+<Class name="apex.MedicationData">
+<Super>%Persistent</Super>
+<TimeCreated>64028,73483.170277</TimeCreated>
+
+<Property name="Sta3n">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="DFN">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Patient">
+<Type>apex.Patient</Type>
+</Property>
+
+<Property name="CaseName">
+<Type>%String</Type>
+</Property>
+
+<Property name="SSN">
+<Type>%String</Type>
+</Property>
+
+<Property name="MedicationName">
+<Type>%String</Type>
+</Property>
+
+<Property name="FillDate">
+<Type>%String</Type>
+</Property>
+
+<Property name="ExpireDate">
+<Type>%String</Type>
+</Property>
+
+<Property name="Schedule">
+<Type>%String</Type>
+</Property>
+
+<Property name="Quantity">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="DaysSupply">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="NumberOfRefills">
+<Type>%Integer</Type>
+</Property>
+
+<Property name="Provider">
+<Type>%String</Type>
+</Property>
+
+<Method name="FindPatients">
+<ClassMethod>1</ClassMethod>
+<Implementation><![CDATA[
+	Set id =$Order(^apex.MedicationDataD(0))
+	While +id
+	{
+		Set oMed=..%OpenId(id)
+		If $IsObject(oMed)
+		{
+			Set CaseName=oMed.CaseName
+			Set Sta3n=oMed.Sta3n
+			Set PatID=$Order(^apex.PatientDataI("CaseNameIndex",Sta3n,CaseName,0))
+			//Write PatID,!
+			If +PatID
+			{
+				Set oPat=##class(PatientData).%OpenId(PatID)
+				If $IsObject(oPat)
+				{
+					Set oMed.SSN=oPat.ApexPatient.SSN
+					Set oMed.Patient=oPat.ApexPatient
+					Set oMed.DFN=oPat.DFN
+					Write:oMed.%Save() "."
+				}
+			}
+		}
+		Set id =$Order(^apex.MedicationDataD(id))
+	}
+]]></Implementation>
+</Method>
+
+<Storage name="Default">
+<Type>%Library.CacheStorage</Type>
+<DataLocation>^apex.MedicationDataD</DataLocation>
+<DefaultData>MedicationDataDefaultData</DefaultData>
+<IdLocation>^apex.MedicationDataD</IdLocation>
+<IndexLocation>^apex.MedicationDataI</IndexLocation>
+<StreamLocation>^apex.MedicationDataS</StreamLocation>
+<Data name="MedicationDataDefaultData">
+<Value name="1">
+<Value>%%CLASSNAME</Value>
+</Value>
+<Value name="2">
+<Value>CaseName</Value>
+</Value>
+<Value name="3">
+<Value>SSN</Value>
+</Value>
+<Value name="4">
+<Value>MedicationName</Value>
+</Value>
+<Value name="5">
+<Value>FillDate</Value>
+</Value>
+<Value name="6">
+<Value>ExpireDate</Value>
+</Value>
+<Value name="7">
+<Value>Schedule</Value>
+</Value>
+<Value name="8">
+<Value>Quantity</Value>
+</Value>
+<Value name="9">
+<Value>DaysSupply</Value>
+</Value>
+<Value name="10">
+<Value>NumberOfRefills</Value>
+</Value>
+<Value name="11">
+<Value>Provider</Value>
+</Value>
+<Value name="12">
+<Value>Sta3n</Value>
+</Value>
+<Value name="13">
+<Value>DFN</Value>
+</Value>
+<Value name="14">
+<Value>Patient</Value>
+</Value>
+</Data>
+</Storage>
+</Class>
+</Export>
